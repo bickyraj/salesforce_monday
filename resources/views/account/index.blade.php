@@ -22,7 +22,7 @@
           </thead>
           <tbody>
           	@if($accounts)
-				@foreach($accounts as $key => $item)
+      				@foreach($accounts as $key => $item)
 		            <tr>
 		              <th scope="row">{{ ++$key }}</th>
 		              <td>{{ $item['Name'] }}</td>
@@ -35,7 +35,7 @@
 		              	</form>
 		              </td>
 		            </tr>
-				@endforeach      	
+      				@endforeach      	
           	@endif
           </tbody>
         </table>

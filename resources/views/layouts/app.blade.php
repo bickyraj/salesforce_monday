@@ -29,7 +29,7 @@
 
                     <!-- Branding Image -->
                     <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', 'Laravel') }}
+                        {{ config('app.name', 'Salesforce-Monday') }}
                     </a>
                 </div>
 
@@ -75,10 +75,16 @@
             <div class="row">
                 @auth
                 <div class="col-md-3">
+                    <h3>Salesforce</h3>
                     <ul class="list-group">
                       <li class="list-group-item"><a href="{{ route('salesforce.account') }}">Accounts</a></li>
                       <li class="list-group-item"><a href="{{ route('salesforce.contact') }}">Contacts</a></li>
-                      <li class="list-group-item"><a href="">Leads</a></li>
+                    </ul>
+
+                    <h3>Monday</h3>
+                    <ul class="list-group">
+                      <li class="list-group-item"><a href="{{ route('salesforce.account') }}">Boards</a></li>
+                      <li class="list-group-item"><a href="{{ route('salesforce.contact') }}">Groups</a></li>
                     </ul>
                 </div>
                 @endauth

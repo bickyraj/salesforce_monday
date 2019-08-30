@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\BulkController;
 use Forrest;
 use Session;
 
-class SalesController extends Controller
+class SalesController extends BulkController
 {
 	public function accounts()
 	{
@@ -98,26 +99,29 @@ class SalesController extends Controller
 
 	}
 
-	public function abortJob()
-	{
-		$jobs = Forrest::get('/services/data/v41.0/jobs/ingest');
+	// public function abortJob()
+	// {
+	// 	$jobs = Forrest::get('/services/data/v41.0/jobs/ingest');
 
-		foreach ($jobs['records'] as $key => $job) {
-			if ($job['apiVersion'] == 41.0) {
-				Forrest::patch('/services/data/v41.0/jobs/ingest/' . $job['id'], [
-					"state" => "Aborted"
-				]);
-			} else {
-				Forrest::patch('/services/data/v44.0/jobs/ingest/' . $job['id'], [
-					"state" => "Aborted"
-				]);
-			}
-		}
-	}
+	// 	foreach ($jobs['records'] as $key => $job) {
+	// 		if ($job['apiVersion'] == 41.0) {
+	// 			Forrest::patch('/services/data/v41.0/jobs/ingest/' . $job['id'], [
+	// 				"state" => "Aborted"
+	// 			]);
+	// 		} else {
+	// 			Forrest::patch('/services/data/v44.0/jobs/ingest/' . $job['id'], [
+	// 				"state" => "Aborted"
+	// 			]);
+	// 		}
+	// 	}
+	// }
 
 	public function contacts()
 	{
-		return view('contact.index');
+		$contacts = Forrest::get('/services/data/v28.0/query/?q=SELECT+Name+FROM+Contact+LIMIT+100+FOR+VIEW')['records'];
+		// $contacts = Forrest::sobjects('Contact')['recentItems'];
+		// dd($contacts);
+		return view('contact.index', compact('contacts'));
 	}
 
 	public function importCsv(Request $request)
@@ -126,14 +130,15 @@ class SalesController extends Controller
 		$csvdata = file_get_contents($file);
 
 		$rows = array_map('str_getcsv', explode("\n", $csvdata));
-
 		$header = array_shift($rows);
 
 		$new_data = [];
 		foreach ($rows as $row) {
-			$new_data[] = $row = array_combine($header, $row);
-		}
+			if (count($row) > 1) {
+				$new_data[] = $row = array_combine($header, $row);
+			}
 
-		dd($new_data);
+		}
+		return parent::newjob($new_data);
 	}
 }

@@ -23,6 +23,26 @@
             <input type="submit" value="Submit">
           </div>
         </form>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              {{-- <th scope="col">Action</th> --}}
+            </tr>
+          </thead>
+          <tbody>
+            @if($contacts)
+              @foreach($contacts as $key => $item)
+                <tr>
+                  <th scope="row">{{ ++$key }}</th>
+                  <td>{{ $item['Name'] }}</td>
+                </tr>
+              @endforeach       
+            @endif
+          </tbody>
+        </table>
     </div>
 </div>
 @endsection

@@ -8,19 +8,25 @@ use SalesforceBulkApi\dto\CreateJobDto;
 use SalesforceBulkApi\objects\SFBatchErrors;
 use SalesforceBulkApi\conf\LoginParams;
 use SalesforceBulkApi\services\JobSFApiService;
+use Illuminate\Support\Facades\Crypt;
 use Forrest;
 use Session;
 
 class BulkController extends Controller
 {
 
-	public function newjob()
+	public function getSfToken()
 	{
+		return Crypt::decryptString(Session::get('sf_token'));
+	}
+
+	public function newjob($data)
+	{	
 		$client = new Client;
 
 		$response = $client->request('POST', 'https://ap15.salesforce.com/services/async/44.0/job', [
 		    'headers' => [
-		        'X-SFDC-Session' => '00D2v0000026WnZ!ARkAQLuOdbEnHY485.Smjq.Aw2fi8iRzCh_yo8OR8avA9ABfYGV4hATQctF74zgEWY6Ott3BV.fztVO_ASK3c8xhSAerkyne',
+		        'X-SFDC-Session' => $this->getSfToken(),
 		        'Content-Type'     => 'application/json',
 		    ],
 		    'json' => [
@@ -31,9 +37,14 @@ class BulkController extends Controller
 		]);
 
 		$result = $response->getBody();
-		// dd(json_decode($result)->id);
+		$job_id = json_decode($result)->id;
 
-		return $result;
+		$batch = $this->createBatch($job_id, $data);
+
+		if ($batch->state == "Queued") {
+			Session::flash('status', 'The contact has been exported.');
+			return redirect()->route('admin.dashboard');
+		}
 	}
 
 	public function abortJob($id)
@@ -74,41 +85,41 @@ class BulkController extends Controller
 		return $response->getBody();
 	}
 
-	public function createBatch($id)
+	public function createBatch($id, $data)
 	{
+
+		// $data = [
+		// 	[
+		// 		"FirstName" => "Bahubali",
+		// 		"LastName" => "Jones",
+		// 		"Title" => "Senior Director",
+		// 		"Birthdate" => "1940-06-07",
+		// 		"Description" => "Self-described as the top branding guru on the West Coast" 
+		// 	],
+		// 	[
+		// 		"FirstName" => "Ian",
+		// 		"LastName" => "Dury",
+		// 		"Title" => "Chief Imagineer",
+		// 		"Birthdate" => "1940-06-07",
+		// 		"Description" => "World-renowned expert in fuzzy logic design" 
+		// 	]
+		// ];
+
+		// dd($data);
 		$url = 'https://ap15.salesforce.com/services/async/44.0/job/';
-
-		// 7502v00000EwCVEAA3
-		// 7512v00000MBPouAAH
 		$client = new Client;
-
-		$data = [
-			[
-				"FirstName" => "Tom",
-				"LastName" => "Jones",
-				"Title" => "Senior Director",
-				"Birthdate" => "1940-06-07",
-				"Description" => "Self-described as the top branding guru on the West Coast" 
-			],
-			[
-				"FirstName" => "Ian",
-				"LastName" => "Dury",
-				"Title" => "Chief Imagineer",
-				"Birthdate" => "1940-06-07",
-				"Description" => "World-renowned expert in fuzzy logic design" 
-			]
-		];
-
 
 		$response = $client->request('POST', $url . $id . '/batch', [
 		    'headers' => [
-		        'X-SFDC-Session' => '00D2v0000026WnZ!ARkAQLuOdbEnHY485.Smjq.Aw2fi8iRzCh_yo8OR8avA9ABfYGV4hATQctF74zgEWY6Ott3BV.fztVO_ASK3c8xhSAerkyne',
+		        'X-SFDC-Session' => $this->getSfToken(),
 		        'Content-Type'     => 'application/json; charset=UTF8',
 		    ],
 		    'json' => $data
 		]);
 
-		return $response->getBody();
+		$response = json_decode($response->getBody());
+
+		return $response;
 	}
 
 	public function createAccountBatch($id)
@@ -149,12 +160,12 @@ class BulkController extends Controller
 
 		$response = $client->request('GET', $url . $id, [
 		    'headers' => [
-		        'X-SFDC-Session' => '00D2v0000026WnZ!ARkAQLuOdbEnHY485.Smjq.Aw2fi8iRzCh_yo8OR8avA9ABfYGV4hATQctF74zgEWY6Ott3BV.fztVO_ASK3c8xhSAerkyne',
+		        'X-SFDC-Session' => $this->getSfToken(),
 		        'Content-Type'     => 'application/json',
 		    ]
 		]);
 
-		return $response->getBody();
+		return json_decode($response->getBody(), true);
 	}
 
 	public function checkChanges()
@@ -162,5 +173,10 @@ class BulkController extends Controller
 		$response = Forrest::get('/services/data/v34.0/sobjects');
 
 		dd($response);
+	}
+
+	public function just()
+	{
+		die('ok');
 	}
 }
