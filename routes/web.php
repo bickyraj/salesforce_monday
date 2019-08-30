@@ -66,4 +66,8 @@ Route::get('batchInfo/{id}', 'BulkController@batchInfo');
 Route::get('checkChanges', 'BulkController@checkChanges');
 
 // monday graphQL
-Route::get('monday/boards', 'MondayApiController@getBoards');
+Route::get('monday/boards', 'MondayApiController@getBoards')->name('monday.boards');
+Route::get('monday/board/{id}/detail', 'MondayApiController@getBoardDetail')->name('monday.board.detail');
+Route::post('monday/board', 'MondayApiController@storeBoard')->name('monday.board.store');
+Route::get('monday/board', 'MondayApiController@addBoard')->name('monday.board.add');
+// Route::delete('/monday/board/{id}', 'MondayApiController@destroyBoard')->name('monday.board.delete');

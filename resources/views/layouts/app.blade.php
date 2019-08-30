@@ -83,8 +83,7 @@
 
                     <h3>Monday</h3>
                     <ul class="list-group">
-                      <li class="list-group-item"><a href="{{ route('salesforce.account') }}">Boards</a></li>
-                      <li class="list-group-item"><a href="{{ route('salesforce.contact') }}">Groups</a></li>
+                      <li class="list-group-item"><a href="{{ route('monday.boards') }}">Boards</a></li>
                     </ul>
                 </div>
                 @endauth
