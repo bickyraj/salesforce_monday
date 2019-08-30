@@ -1,0 +1,8 @@
+Sales Force Integration
+
+Created a salesforce developer edititon organization.
+
+https://login.salesforce.com/services/oauth2/authorize?response_type=code
+&client_id=3MVG9G9pzCUSkzZtlTBlYN1t6DLv8wmoX7JBBIXYWejVsRbdhv6rnkMEp7Gpq2alIbSZ00yoAIN8mDD038i1x&redirect_uri=https://laravel.localhost/salesforce/oauth/_salesforce-callback
+
+https://laravel.localhost/salesforce/api/oauth/_salesforce-callback?code=aPrxYXyxzkuBzbjjR7xt8GZju3zq.ahqGrQTWMOY0evPbuDfVwvRMCkgzSFMhEnQJ86QmTf8Pw%3D%3D
